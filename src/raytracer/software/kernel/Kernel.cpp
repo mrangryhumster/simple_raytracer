@@ -10,6 +10,8 @@ namespace Raytracer
 			const uint32_t ypixel_max = (regionCfg.m_StartY + regionCfg.m_Height);
 			const uint32_t xpixel_max = (regionCfg.m_StartX + regionCfg.m_Width);
 
+			KernelInternals internals {sceneCfg};
+			//****************************************************************
 			for (uint32_t ypixel = regionCfg.m_StartY; ypixel < ypixel_max; ypixel++)
 			{
 				color3u* pixelRow = (color3u*)targetCfg.m_Framebuffer.getData(regionCfg.m_StartX, ypixel);
@@ -29,7 +31,7 @@ namespace Raytracer
 						const float u = (static_cast<float>(xpixel) + random_uniform_float()) / tWidth;
 						const float v = (static_cast<float>(ypixel) + random_uniform_float()) / tHeight;
 						RayInfo ray = sceneCfg.m_SceneCamera.CastRay(u, v);
-						pixelColor += Kernel::Trace(kernelCfg.m_RayMaxBounces + 1, ray, sceneCfg);
+						pixelColor += Kernel::Trace(kernelCfg.m_RayMaxBounces + 1, ray, internals);
 					}
 
 					//One ray always shots in the center of pixel (rest of the code same as above)
@@ -38,10 +40,10 @@ namespace Raytracer
 						const float u = (static_cast<float>(xpixel) + 0.5f) / tWidth;
 						const float v = (static_cast<float>(ypixel) + 0.5f) / tHeight;
 						RayInfo ray = sceneCfg.m_SceneCamera.CastRay(u, v);
-						pixelColor += Kernel::Trace(kernelCfg.m_RayMaxBounces + 1, ray, sceneCfg);
+						pixelColor += Kernel::Trace(kernelCfg.m_RayMaxBounces + 1, ray, internals);
 					}
 					//-------------------------------------------------------
-					*(pixelRow++) = ConvertColor(pixelColor, regionCfg.m_Samples, 0.0f);
+					*(pixelRow++) = ConvertColor(pixelColor, regionCfg.m_Samples, nullptr);
 				}
 			}
 			//****************************************************************
@@ -50,16 +52,17 @@ namespace Raytracer
 		color3f Kernel::Trace(
 			uint32_t depth,
 			RayInfo& rayInfo,
-			const SceneConfig& scene)
+			KernelInternals& internals
+		)
 		{
 			if (depth == 0) return color3f(0.0f, 0.0f, 0.0f);
 
 
 			SurfaceHitInfo	hitInfo;
-			if (scene.m_SceneHierarchy->FindIntersection(rayInfo, hitInfo))
+			if (internals.scene.m_SceneHierarchy->FindIntersection(rayInfo, hitInfo))
 			{
 				RayInfo scatterRay = MaterialObject::GetScatterRay(rayInfo, hitInfo);
-				color3f colorAccumulator = Trace(depth - 1, scatterRay, scene);
+				color3f colorAccumulator = Trace(depth - 1, scatterRay, internals);
 
 				return MaterialObject::ColorBlending(colorAccumulator, hitInfo);
 				//return (colorAccumulator = color3f(hitInfo.m_Normal.x, hitInfo.m_Normal.y, hitInfo.m_Normal.z));
@@ -68,7 +71,7 @@ namespace Raytracer
 			//return ColorGradient((rayInfo.m_Direction.y + 1.0f)*0.5f, Gradient::Skybox_Data, Gradient::Skybox_Curve, Gradient::Skybox_Size);
 			//return ColorGradient((rayInfo.m_Direction.y + 1.0f) * 0.5f, color3f(1.f, 1.f, 1.f), color3f(0.5f, 0.7f, 1.0f));
 			//return color3f(1.0f,1.0f,1.0f);
-			return color3f(0.0f, 0.0f, 0.0f);
+			return internals.scene.m_AmbientColor;
 		}
 	}
 }

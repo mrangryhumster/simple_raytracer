@@ -80,7 +80,18 @@ namespace Raytracer
 				static_cast<float>((gradient_data[ramp_index_2].b - gradient_data[ramp_index_1].b) * frac + gradient_data[ramp_index_1].b));
 		}
 		//-------------------------------------------------------------------------------------------------------------------------------
-		inline ncolor3<uint8_t> ConvertColor(const ncolor3<float>& cf32, uint32_t samples, float gamma)
+		inline uint8_t* BuildGammaLookupTable(float gamma)
+		{
+			uint8_t* table = new uint8_t[256];
+			return table;
+		}
+
+		inline void DestroyGammaLookupTable(uint8_t* gammaLookupTable)
+		{
+			delete gammaLookupTable;
+		}
+
+		inline ncolor3<uint8_t> ConvertColor(const ncolor3<float>& cf32, uint32_t samples, uint8_t* gammaLookupTable)
 		{
 			auto r = cf32.r;
 			auto g = cf32.g;
@@ -91,9 +102,9 @@ namespace Raytracer
 			if (b != b) b = 0.0f;
 
 			auto scale = 1.0 / samples;
-			r = sqrt(scale * r);
-			g = sqrt(scale * g);
-			b = sqrt(scale * b);
+			r = (scale * r);
+			g = (scale * g);
+			b = (scale * b);
 
 			if (r > 0.999f) r = 0.999f;
 			else if (r < 0.0f) r = 0.0f;

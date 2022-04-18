@@ -26,8 +26,12 @@ namespace Raytracer
 		void MakeDefault();
 		void Validate();
 		//----------------------------------------------------------------
-		void setMainCamera(uint64_t id);
 		std::shared_ptr<RaytracerCamera> const& getMainCamera() const;
+		void setMainCamera(uint64_t id);
+		//--------------------------------
+		color3f const& getAmbientColor() const;
+		color3f& getAmbientColorNonConst();
+		void getAmbientColor(color3f& color);
 		//----------------------------------------------------------------
 		std::vector<std::shared_ptr<RaytracerCamera>> const& getCameraArray() const;
 		std::shared_ptr<RaytracerCamera> const& getCamera(uint64_t id) const;
@@ -58,6 +62,7 @@ namespace Raytracer
 	private:
 		//Scene configuration
 		std::shared_ptr<RaytracerCamera>						m_MainCamera;
+		color3f													m_AmbientColor;
 		//Containers
 		std::map<uint64_t, std::shared_ptr<RaytracerCamera>>	m_CameraDictionary;
 		std::vector<std::shared_ptr<RaytracerCamera>>			m_CameraArray;

@@ -65,6 +65,7 @@ namespace Raytracer
 			KernelConfig				m_rtKernelConfig;
 			std::vector<RegionConfig>   m_rtKernelRegions;
 			//RT kernel scene
+			color3f						 m_rtKernelAmbientColor;
 			SceneCamera					 m_rtKernelCamera;
 			std::vector<TextureObject*>	 m_rtKernelTextures;
 			std::vector<MaterialObject*> m_rtKernelMaterials;

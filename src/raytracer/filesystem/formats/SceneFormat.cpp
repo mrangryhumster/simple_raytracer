@@ -246,6 +246,7 @@ namespace Raytracer
 		inline static void ExportSceneConfiguration(json& sceneJson, RaytracerSceneContainer* scene)
 		{
 			sceneJson["configuration"]["main_camera"] = scene->getMainCamera()->m_Id;
+			sceneJson["configuration"]["ambient_color"] = scene->getAmbientColor();
 		}
 
 		//****************************************************************
@@ -316,10 +317,11 @@ namespace Raytracer
 		inline static void ImportSceneMaterials(json& sceneJson, RaytracerSceneContainer* scene)
 		{
 			//This macro will reduce material importing code
-			#define MATERIAL_LOAD_FIELD(JSON_TOKEN,FIELD_TOKEN,FIELD_TYPE)																					\
+			#define MATERIAL_LOAD_FIELD(JSON_TOKEN,FIELD_TOKEN,FIELD_TYPE,DEFAULT_VALUE)																	\
 			material->m_Is##FIELD_TOKEN##Texture = materialJson.contains(JSON_TOKEN "_texture");															\
 			if (material->m_Is##FIELD_TOKEN##Texture) material->m_##FIELD_TOKEN##.TextureId = materialJson.at(JSON_TOKEN"_texture").get<uint64_t>();		\
 			else if(materialJson.contains(JSON_TOKEN)) material->m_##FIELD_TOKEN##.Value = materialJson.at(JSON_TOKEN).get<FIELD_TYPE>();					\
+			else material->m_##FIELD_TOKEN##.Value = FIELD_TYPE##DEFAULT_VALUE;																							\
 			//-----------------------------------------------
 			uint32_t version = sceneJson["version"].get<uint32_t>();
 			if (version == SceneJsonVersionCurrent)
@@ -332,13 +334,13 @@ namespace Raytracer
 					auto material = RaytracerMaterial::Create(materialJson.at("id").get<uint64_t>());
 
 					//Read material data
-					MATERIAL_LOAD_FIELD("albedo",			Albedo,				nvec3<float>);
-					MATERIAL_LOAD_FIELD("metallic",			Metallic,			float);
-					MATERIAL_LOAD_FIELD("roughness",		Roughness,			float);
-					MATERIAL_LOAD_FIELD("ior",				IOR,				float);
-					MATERIAL_LOAD_FIELD("transmission",		Transmission,		float);
-					MATERIAL_LOAD_FIELD("emission_strength",EmissionStrength,	float);
-					MATERIAL_LOAD_FIELD("emission_color",	EmissionColor,		nvec3<float>);
+					MATERIAL_LOAD_FIELD("albedo", Albedo, nvec3<float>, (1.0f, 1.0f, 1.0f) );
+					MATERIAL_LOAD_FIELD("metallic", Metallic, float, (0.0f));
+					MATERIAL_LOAD_FIELD("roughness", Roughness, float, (0.0f));
+					MATERIAL_LOAD_FIELD("ior", IOR, float, (0.0f));
+					MATERIAL_LOAD_FIELD("transmission", Transmission, float, (0.0f));
+					MATERIAL_LOAD_FIELD("emission_strength", EmissionStrength, float, (0.0f));
+					MATERIAL_LOAD_FIELD("emission_color", EmissionColor, nvec3<float>, (0.0f, 0.0f, 0.0f));
 					//----------------
 
 					scene->addMaterial(material);
@@ -396,6 +398,8 @@ namespace Raytracer
 				auto configurationJson = sceneJson.at("configuration");
 				if (configurationJson.contains("main_camera"))
 					scene->setMainCamera(configurationJson.at("main_camera").get<uint64_t>());
+				if (configurationJson.contains("ambient_color"))
+					scene->getAmbientColor(configurationJson.at("ambient_color").get<nvec3<float>>());
 			}
 		}
 

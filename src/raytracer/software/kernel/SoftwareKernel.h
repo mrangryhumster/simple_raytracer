@@ -57,6 +57,7 @@ namespace Raytracer
 #include "TargetConfig.h"
 #include "RegionConfig.h"
 #include "SceneConfig.h"
+#include "KernelInternals.h"
 
 #include "Kernel.h"
 //--------------------------------

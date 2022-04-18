@@ -182,7 +182,7 @@ namespace Raytracer
 						m_rtKernelConfig,
 						TargetConfig(m_RaytracingFramebuffer),
 						m_rtKernelRegions[i],
-						SceneConfig(m_rtKernelCamera, m_rtKernelSceneHierarchy)
+						SceneConfig(m_rtKernelAmbientColor, m_rtKernelCamera, m_rtKernelSceneHierarchy)
 					);
 				}
 				//----------------------------------------------------------------
@@ -357,6 +357,8 @@ namespace Raytracer
 					break;
 				}
 			}
+			//-------------------------------------------------------------------
+			m_rtKernelAmbientColor = m_RaytracerScene->getAmbientColor();
 			//-------------------------------------------------------------------
 			const auto mainCamera = m_RaytracerScene->getMainCamera();
 			m_rtKernelCamera.setView(

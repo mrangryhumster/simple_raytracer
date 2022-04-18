@@ -90,14 +90,29 @@ namespace Raytracer
 		);
 	}
 
+	std::shared_ptr<RaytracerCamera> const& RaytracerSceneContainer::getMainCamera() const
+	{
+		return m_MainCamera;
+	}
+
 	void RaytracerSceneContainer::setMainCamera(uint64_t id)
 	{
 		m_MainCamera = getCamera(id);
 	}
 
-	std::shared_ptr<RaytracerCamera> const& RaytracerSceneContainer::getMainCamera() const
+	color3f const& RaytracerSceneContainer::getAmbientColor() const
 	{
-		return m_MainCamera;
+		return m_AmbientColor;
+	}
+
+	color3f& RaytracerSceneContainer::getAmbientColorNonConst()
+	{
+		return m_AmbientColor;
+	}
+
+	void RaytracerSceneContainer::getAmbientColor(color3f& color)
+	{
+		m_AmbientColor = color;
 	}
 
 	std::vector<std::shared_ptr<RaytracerCamera>> const& RaytracerSceneContainer::getCameraArray() const

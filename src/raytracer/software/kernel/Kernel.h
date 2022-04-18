@@ -20,7 +20,8 @@ namespace Raytracer
 			static color3f Trace(
 				uint32_t depth,
 				RayInfo& ray,
-				const SceneConfig& scene);
+				KernelInternals& internals
+			);
 
 		};
 	}

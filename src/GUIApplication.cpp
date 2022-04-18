@@ -163,7 +163,6 @@ void GUIApplication::DrawGui()
     //-----------------------------------------------------------------------
     static bool showWindowMainAsDetached = false;
     static bool showWindowRendrerConfig = false;
-    static bool showWindowRendrerControl = false;
     static bool showWindowImguiDebug = false;
     //*****************************************************
     if (ImGui::BeginMainMenuBar())
@@ -233,7 +232,6 @@ void GUIApplication::DrawGui()
             ImGui::MenuItem("Detach main window", nullptr, &showWindowMainAsDetached);
             ImGui::Separator();
             ImGui::MenuItem("Rendrer Configuration", nullptr, &showWindowRendrerConfig);
-            //ImGui::MenuItem("Rendrer Controls", nullptr, &showWindowRendrerControl);
             ImGui::EndMenu();
         }
 
@@ -311,7 +309,10 @@ void GUIApplication::DrawGui()
         ImGui::SetNextWindowSizeConstraints(ImVec2(400, 400), ImVec2(400, 400));
         if (ImGui::Begin("Configuration", &showWindowRendrerConfig, mainWindowChildsFlags))
         {
-            if (isRaytracing) ImGui::Text("Controls disabled - raytracing in process...");
+            if (isRaytracing)
+            {
+                ImGui::Text("Controls disabled - raytracing in process...");
+            }
             if (ImGui::CollapsingHeader("Target", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 ImGui::Indent(32.f);
@@ -327,9 +328,9 @@ void GUIApplication::DrawGui()
                 ImGui::Indent(32.f);
                 ImGui::BeginDisabled(isRaytracing);
                 ImGui::DragInt("Max Bounces", reinterpret_cast<int*>(&m_RaytracerConfig.m_RayMaxBounces), 1.0f, 0, GUIAPP_MAX_BOUNCES);
-                ImGui::DragInt("Diffuse", reinterpret_cast<int*>(&m_RaytracerConfig.m_RayMaxDiffuseBounces), 1.0f, 0, GUIAPP_MAX_BOUNCES);
-                ImGui::DragInt("Reflection", reinterpret_cast<int*>(&m_RaytracerConfig.m_RayMaxReflectionBounces), 1.0f, 0, GUIAPP_MAX_BOUNCES);
-                ImGui::DragInt("Refraction", reinterpret_cast<int*>(&m_RaytracerConfig.m_RayMaxRefractionBounces), 1.0f, 0, GUIAPP_MAX_BOUNCES);
+                //ImGui::DragInt("Diffuse", reinterpret_cast<int*>(&m_RaytracerConfig.m_RayMaxDiffuseBounces), 1.0f, 0, GUIAPP_MAX_BOUNCES);
+                //ImGui::DragInt("Reflection", reinterpret_cast<int*>(&m_RaytracerConfig.m_RayMaxReflectionBounces), 1.0f, 0, GUIAPP_MAX_BOUNCES);
+                //ImGui::DragInt("Refraction", reinterpret_cast<int*>(&m_RaytracerConfig.m_RayMaxRefractionBounces), 1.0f, 0, GUIAPP_MAX_BOUNCES);
                 ImGui::EndDisabled();
                 ImGui::Indent(-32.f);
             }
@@ -351,17 +352,16 @@ void GUIApplication::DrawGui()
                 ImGui::EndDisabled();
                 ImGui::Indent(-32.f);
             }
+
+            if (ImGui::CollapsingHeader("Enviroment", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::Indent(32.f);
+                ImGui::BeginDisabled(isRaytracing);
+                ImGui::ColorEdit3("AmbientColor", &m_RaytracerScene->getAmbientColorNonConst().x);
+                ImGui::EndDisabled();
+                ImGui::Indent(-32.f);
+            }
             
-            ImGui::End();
-        } 
-    }
-    //*****************************************************
-    
-    if (showWindowRendrerControl)
-    {
-        ImGui::SetNextWindowSizeConstraints(ImVec2(300, 300), ImVec2(300, 300));
-        if (ImGui::Begin("Controls", nullptr, mainWindowChildsFlags))
-        {
             ImGui::End();
         } 
     }
